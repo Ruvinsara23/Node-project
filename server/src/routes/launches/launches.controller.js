@@ -1,4 +1,4 @@
-const {getAllLaunches,addNewLaunch}=require('../../models/launches.models');
+const {getAllLaunches,addNewLaunch,existsLaunchWithId,abortLaunchById}=require('../../models/launches.models');
 
 
 
@@ -11,7 +11,7 @@ function httpAddNewLaunch(req, res) {
 
     if (!launch.mission || !launch. rocket
         || !launch. launchDate
-        || !launch.destination) {
+        || !launch.target) {
        return res.status(400).json({
         error:'Missing something'
        })
@@ -21,20 +21,25 @@ function httpAddNewLaunch(req, res) {
     return res.status(201).json(launch);
 }
 
-// function httpGetAllLaunches(req,res) {
-//     return res.status(200).json(getAllLaunches());
-     
-// }
+function httpAbortLaunch(req,res){
+    const launchId=Number(req.params.id);
 
-// function httpAddNewLaunch(req,res){
-//     const launch=req.body;
-//     launch.launchDate=new Date(launch.launchDate);
-//     addNewLaunch(launch)
-//    return res.status(201);
-// }
+    if (!existsLaunchWithId(launchId)) {
+        return res.status(404).json({
+        error: 'Launch not found',})}
+
+const aborted =abortLaunchById(launchId);
+return res.status(200).json(aborted)
+
+}
+
+
+
+
 
 
 module.exports={
     httpGetAllLaunches,
-    httpAddNewLaunch
+    httpAddNewLaunch,
+    httpAbortLaunch 
 }
