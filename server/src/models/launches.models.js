@@ -1,15 +1,15 @@
 const launchesDatabase = require('./launches.mongo')
 const planets=require('./planets.mongo')
 
- const launches =new Map();
 
-let  latestFlightNumber=100;
+
+// let  latestFlightNumber=100;
 const launch={
     flightNumber:100,
     mission:'Kepler Exploration x',
-    rocket:'Explorer Is1',
+    rocket:'Kepler-442 b',
     launchDate: new Date('December 27,2030'),
-    target:'Kepler',
+    target:'Kepler-1652 b',
     customer:['ZTM','NASA'],
     upcoming:true,
     success:true,
@@ -17,10 +17,12 @@ const launch={
 
 saveLaunch(launch )
 
-launches.set(launch.flightNumber,launch);
+// launches.set(launch.flightNumber,launch);
 
-function existsLaunchWithId(launchId){
-    return launches.has(launchId);
+async function existsLaunchWithId(launchId){
+    return await launchesDatabase.findOne({
+        flightNumber:launchId
+    });
 
 }
 
@@ -45,7 +47,7 @@ async function saveLaunch(launch){
         throw new Error ('No matching planet found  ')
 
     }
-    await launchesDatabase.updateOne({
+    await launchesDatabase.findOneAndUpdate({
         flightNumber: launch.flightNumber,     
     },launch,{
         upsert:true
@@ -59,7 +61,7 @@ async function scheduleNewLaunch(){
         success:true,
         upcoming:true,
         customer:['Zero to mastery','NASA'],
-        flightnumber:newFlightNumber,
+        flightNumber:newFlightNumber,
     })
 
     await saveLaunch(newLaunch)
@@ -78,18 +80,23 @@ async function scheduleNewLaunch(){
 
 // }
 
-function abortLaunchById(launchId){
-     const aborted= launches.get(launchId);
-     aborted.upcoming=false;
-     aborted.success=false; 
-     return aborted;
-}
+async function abortLaunchById(launchId){
+   return await launchesDatabase.updateOne({
+        flightNumber:launchId,
+    
+    },{
+        upcoming:false,
+        success:false,
+    });
+
+    return abored.ok===1 && aborted.nModified===1;
+    }
 
 
 module.exports={ 
     existsLaunchWithId,
     getAllLaunches,
-    addNewLaunch,
+ 
     scheduleNewLaunch,
     abortLaunchById,
 
