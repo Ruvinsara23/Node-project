@@ -29,7 +29,7 @@ const filePath = path.join(__dirname,'..','..','data','kepler_data.csv');
   .on('data',async (data) => {
    
     if (isHabitablePlanet(data)) {
-      console.log(data ,"before pass save");
+     
       await  savePlanet(data);
      
     }
