@@ -1,6 +1,5 @@
 const launchesDatabase = require('./launches.mongo')
-const planets=require('./planets.mongo')
-
+const Plantes = require('./planets.mongo');
 
 
 // let  latestFlightNumber=100;
@@ -39,25 +38,37 @@ async function getLatestFlightNumber(){
   return latestLaunch.flightNumber
 }
 
-async function saveLaunch(launch){
-    const planet = await planets.findOne({
-        keplerName:launch.target,
-    })
-    if(!planet){
-        throw new Error ('No matching planet found  ')
+// async function saveLaunch(launch){
+//     const planet= await plantes.findOne({
+//         keplerName:launch.target,
+//     })
+//     if(!planet){
+//         throw new Error ('No matching planet found  ')
 
+//     }
+//     await launchesDatabase.findOneAndUpdate({
+//         flightNumber: launch.flightNumber,     
+//     },launch,{
+//         upsert:true
+//     })
+// }
+
+async function saveLaunch(launch) {
+    const planet = await Plantes.findOne({ keplerName: launch.target });
+    if (!planet) {
+        throw new Error('No matching planet found');
     }
-    await launchesDatabase.findOneAndUpdate({
-        flightNumber: launch.flightNumber,     
-    },launch,{
-        upsert:true
-    })
+    await launchesDatabase.findOneAndUpdate(
+        { flightNumber: launch.flightNumber },
+        launch,
+        { upsert: true }
+    );
 }
 
-async function scheduleNewLaunch(){
+async function scheduleNewLaunch(launchData){
     const newFlightNumber= await getLatestFlightNumber()+1;
 
-    const newLaunch=Object.assign(launch,{
+    const newLaunch=Object.assign(launchData,{
         success:true,
         upcoming:true,
         customer:['Zero to mastery','NASA'],
