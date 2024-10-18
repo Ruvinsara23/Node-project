@@ -13,7 +13,7 @@ describe('Launches API',()=>{
     describe('Test GET/launchers',()=>{
         test('It shoud response with 200 sucess', async()=>{
             const response=await request(app)
-            .get('/launches')
+            .get('v1/launches')
             .expect('Content-Type',/json/)
             .expect(200);
         })
@@ -24,7 +24,7 @@ describe('Launches API',()=>{
     describe ('Test POST/launchers',()=>{
         test('It should response with 201 created',async()=>{
             const response= await request(app)
-            .post ('/launches')
+            .post ('v1/launches')
             .send({
                 mission: 'USS Enterprise',
                 rocket:'NCC 170-D',
@@ -38,7 +38,7 @@ describe('Launches API',()=>{
         })
         test('It should catch missing required properties', async () => {
     const response = await request(app)
-        .post('/launches') // Change this to POST
+        .post('v1/launches') // Change this to POST
         .send({
             // Intentionally missing some required properties
             mission: 'USS Enterprise',
