@@ -134,7 +134,7 @@ async function loadLaunchData(){
         return payload['customer']
     })
     const launch={
-        fighitNumber:launchDoc['flight_number'],
+        flightNumber:launchDoc['flight_number'],
         mission:launchDoc['name'],
         rocket:launchDoc['date_local'],
         upcomming:launchDoc['upcominng'],
@@ -142,9 +142,12 @@ async function loadLaunchData(){
         customers,
     
     }
-    console.log(`${launch.fighitNumber} ${launch.mission}`);
-
-    await saveLaunch(launch)
+    try {
+        await saveLaunch(launch);
+        console.log(`${launch.flightNumber} ${launch.mission}`);
+    } catch (err) {
+        console.error(`Failed to save launch ${launch.flightNumber}: ${err}`);
+    }
 }
 
   }
