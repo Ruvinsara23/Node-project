@@ -25,14 +25,18 @@ async function findLaunch(filter){
 // launches.set(launch.flightNumber,launch);
 
 async function existsLaunchWithId(launchId){
-    return await launchesDatabase.findLaunch({
+    return await launchesDatabase.findOne({
         flightNumber:launchId
     });
 
 }
 
-async function getAllLaunches(){
-    return await launchesDatabase.find({},{'_id':0,'__v':0})  ;
+async function getAllLaunches(skip,limit){
+    return await launchesDatabase
+    .find({},{'_id':0,'__v':0})
+    .sort({flightNumber:1})
+    .skip(skip)
+    .limit(limit);
 }
 
 async function getLatestFlightNumber(){
@@ -68,7 +72,8 @@ async function saveLaunch(launch) {
 }
 
 async function scheduleNewLaunch(launchData){
-    const planet = await Plantes.findOne({ keplerName: launch.target });
+    try{
+        const planet = await Plantes.findOne({ keplerName: launch.target });
     if (!planet) {
         throw new Error('No matching planet found');
     }
@@ -81,6 +86,11 @@ async function scheduleNewLaunch(launchData){
         flightNumber:newFlightNumber,
     })
 
+    await saveLaunch(newLaunch);
+    console.log(`Launch scheduled successfully!`);
+    }catch (err){
+        console.error(`Error scheduling new launch: ${err}`);
+    }
     
 
 }
@@ -144,7 +154,7 @@ async function loadLaunchData(){
     }
     try {
         await saveLaunch(launch);
-        console.log(`${launch.flightNumber} ${launch.mission}`);
+        // console.log(`${launch.flightNumber} ${launch.mission}`);
     } catch (err) {
         console.error(`Failed to save launch ${launch.flightNumber}: ${err}`);
     }
